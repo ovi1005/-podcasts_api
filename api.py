@@ -124,6 +124,15 @@ def get_top_podcast():
     return jsonify(result)
 
 
+# Replace the top 20 podcasts for bottom 20
+@app.route('/podcast/bottom20', methods=['GET'])
+def get_bottom_podcast():
+    podcasts = Podcast.query.order_by(Podcast.id.desc()).limit(20)
+    result = podcasts_schema.dump(podcasts)
+    with open(os.path.join(dirB, 'podcasts_separate_data.json'), 'w') as file:
+        json.dump(result, file)
+    return jsonify(result)
+
 # Run Server
 if __name__ == '__main__':
     app.run(debug=True)
