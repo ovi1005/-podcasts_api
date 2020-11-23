@@ -1,10 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Table, Column, Integer, ForeignKey
-from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 import os
-Base = declarative_base()
 
 # Init App
 app = Flask(__name__)
@@ -28,9 +25,9 @@ class User(db.Model):
 
 
 # GenrePodcasts
-association_table = Table('GenrePodcasts', Base.metadata,
-                          Column('podcast_id', Integer, ForeignKey('podcast.id')),
-                          Column('genre_id', Integer, ForeignKey('genre.id'))
+association_table = db.Table('genre_podcasts',
+                          db.Column('podcast_id', db.Integer, db.ForeignKey('podcast.id')),
+                          db.Column('genre_id', db.Integer, db.ForeignKey('genre.id'))
                           )
 
 
@@ -47,7 +44,7 @@ class Podcast(db.Model):
     artist_url = db.Column(db.String(100), nullable=True)
     artwork_url100 = db.Column(db.String(100))
     url = db.Column(db.String(100))
-    genres = relationship(
+    genres = db.relationship(
         "Genre",
         secondary=association_table,
         back_populates="podcasts")
@@ -73,12 +70,13 @@ class Genre(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
     url = db.Column(db.String(100))
-    podcasts = relationship(
+    podcasts = db.relationship(
         "Podcast",
         secondary=association_table,
         back_populates="genres")
 
-    def __init__(self, name, url):
+    def __init__(self, id_genre, name, url):
+        self.id = id_genre
         self.name = name
         self.url = url
 
