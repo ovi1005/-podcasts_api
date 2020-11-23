@@ -1,3 +1,4 @@
 .idea/
 __pycache__/
 focus.sqlite
+podcasts_separate_data.json

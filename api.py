@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, make_response
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from marshmallow import fields
+import json
 import os
 
 # Init App
@@ -110,6 +111,16 @@ podcasts_schema = PodcastSchema(many=True)
 def get_podcast(value):
     podcasts = Podcast.query.filter(Podcast.name.ilike("%" + value + "%")).all()
     result = podcasts_schema.dump(podcasts)
+    return jsonify(result)
+
+
+# Save the top 20 podcasts
+@app.route('/podcast/top20', methods=['GET'])
+def get_top_podcast():
+    podcasts = Podcast.query.limit(20)
+    result = podcasts_schema.dump(podcasts)
+    with open(os.path.join(dirB, 'podcasts_separate_data.json'), 'w') as file:
+        json.dump(result, file)
     return jsonify(result)
 
 
