@@ -1,6 +1,7 @@
-from flask import Flask
+from flask import Flask, request, jsonify, make_response
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.ext.declarative import declarative_base
+from flask_marshmallow import Marshmallow
+from marshmallow import fields
 import os
 
 # Init App
@@ -11,6 +12,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(dirB, 'focus
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # Init Data Base
 db = SQLAlchemy(app)
+# Init ma
+ma = Marshmallow(app)
 
 
 # User Class/Model
@@ -26,9 +29,9 @@ class User(db.Model):
 
 # GenrePodcasts
 association_table = db.Table('genre_podcasts',
-                          db.Column('podcast_id', db.Integer, db.ForeignKey('podcast.id')),
-                          db.Column('genre_id', db.Integer, db.ForeignKey('genre.id'))
-                          )
+                             db.Column('podcast_id', db.Integer, db.ForeignKey('podcast.id')),
+                             db.Column('genre_id', db.Integer, db.ForeignKey('genre.id'))
+                             )
 
 
 # Podcast Class/Model
@@ -46,8 +49,7 @@ class Podcast(db.Model):
     url = db.Column(db.String(100))
     genres = db.relationship(
         "Genre",
-        secondary=association_table,
-        back_populates="podcasts")
+        secondary=association_table)
 
     def __init__(self, id_pod, artist_name, release_date, name,
                  kind, copyright_pod, artist_id, content_advisory_rating,
@@ -70,15 +72,45 @@ class Genre(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
     url = db.Column(db.String(100))
-    podcasts = db.relationship(
-        "Podcast",
-        secondary=association_table,
-        back_populates="genres")
 
     def __init__(self, id_genre, name, url):
         self.id = id_genre
         self.name = name
         self.url = url
+
+
+# Genre Schema
+class GenreSchema(ma.Schema):
+    class Meta:
+        fields = ('id', 'name', 'url')
+
+
+# Init Genre schema
+genre_schema = GenreSchema()
+genres_schema = GenreSchema(many=True)
+
+
+# Podcast Schema
+class PodcastSchema(ma.Schema):
+    genres = fields.Nested(GenreSchema,many=True)
+
+    class Meta:
+        fields = ('id', 'artist_name', 'release_date', 'name',
+                  'kind', 'copyright_pod', 'artist_id', 'content_advisory_rating',
+                  'artist_url', 'artwork_url100', 'url', 'genres')
+
+
+# Init Podcast schema
+podcast_schema = PodcastSchema()
+podcasts_schema = PodcastSchema(many=True)
+
+
+# Podcast search
+@app.route('/podcast/<value>', methods=['GET'])
+def get_podcast(value):
+    podcasts = Podcast.query.filter(Podcast.name.ilike("%" + value + "%")).all()
+    result = podcasts_schema.dump(podcasts)
+    return jsonify(result)
 
 
 # Run Server
