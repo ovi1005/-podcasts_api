@@ -178,7 +178,7 @@ def get_bottom_podcast(current_user):
         json.dump(result, file)
     return jsonify(result)
 
-
+# Delete podcasts by id
 @app.route('/podcast/<id>', methods=['DELETE'])
 @token_required
 def delete_podcast(current_user, id):

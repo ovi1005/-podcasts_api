@@ -1,0 +1,292 @@
+{
+	"info": {
+		"_postman_id": "5c5754a6-6b70-409a-9df6-abddedc28cde",
+		"name": "focus-api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Login",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "pass1234",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "jorge",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/login",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Podcasts search by name",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "pass1234",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "jorge",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "x-access-token",
+						"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwdWJsaWNfaWQiOiJhYjI5OTcwMC0xNDQ4LTRjYWMtOTE2ZC1jNTEwMTI4ZjFhMjIiLCJleHAiOjE2MDYxMjk2NzZ9.MH4NgGH-HTlnw_GorfI4dL70ktZfdj5gj2lrZXKDxNc",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://127.0.0.1:5000/podcast/arr",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"podcast",
+						"arr"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Save the top 20 podcasts",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "pass1234",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "jorge",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "x-access-token",
+						"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwdWJsaWNfaWQiOiJhYjI5OTcwMC0xNDQ4LTRjYWMtOTE2ZC1jNTEwMTI4ZjFhMjIiLCJleHAiOjE2MDYxMjk2NzZ9.MH4NgGH-HTlnw_GorfI4dL70ktZfdj5gj2lrZXKDxNc",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://127.0.0.1:5000/podcast/top20",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"podcast",
+						"top20"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Replace the top 20 podcasts for bottom 20",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "pass1234",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "jorge",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "x-access-token",
+						"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwdWJsaWNfaWQiOiJhYjI5OTcwMC0xNDQ4LTRjYWMtOTE2ZC1jNTEwMTI4ZjFhMjIiLCJleHAiOjE2MDYxMjk2NzZ9.MH4NgGH-HTlnw_GorfI4dL70ktZfdj5gj2lrZXKDxNc",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://127.0.0.1:5000/podcast/bottom20",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"podcast",
+						"bottom20"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Podcasts group_by_genre",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "pass1234",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "jorge",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "x-access-token",
+						"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwdWJsaWNfaWQiOiJhYjI5OTcwMC0xNDQ4LTRjYWMtOTE2ZC1jNTEwMTI4ZjFhMjIiLCJleHAiOjE2MDYxMjk2NzZ9.MH4NgGH-HTlnw_GorfI4dL70ktZfdj5gj2lrZXKDxNc",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://127.0.0.1:5000/podcast/group_by_genre",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"podcast",
+						"group_by_genre"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete podcasts by id",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "pass1234",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "jorge",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "x-access-token",
+						"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwdWJsaWNfaWQiOiJhYjI5OTcwMC0xNDQ4LTRjYWMtOTE2ZC1jNTEwMTI4ZjFhMjIiLCJleHAiOjE2MDYxMjk2NzZ9.MH4NgGH-HTlnw_GorfI4dL70ktZfdj5gj2lrZXKDxNc",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://127.0.0.1:5000/podcast/77001367",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"podcast",
+						"77001367"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
