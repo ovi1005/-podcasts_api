@@ -1,7 +1,11 @@
 from api import db
 from api import Genre
 from api import Podcast
+from api import User
+from werkzeug.security import generate_password_hash
 import requests
+import uuid
+
 
 # Create all data base schema
 print('Creating schema ...')
@@ -54,5 +58,9 @@ for podcast in data.json()['feed']['results']:
             new_podcast.genres.append(genre_data)
         db.session.add(new_podcast)
         db.session.commit()
-
+print('Creando usuario de prueba')
+new_user = User(public_id=str(uuid.uuid4()), name='jorge', password=generate_password_hash('pass1234', method='sha256'))
+db.session.add(new_user)
+db.session.commit()
+print("The test user's data are\nname= jorge\npassword: pass1234")
 print('Database and completed data')

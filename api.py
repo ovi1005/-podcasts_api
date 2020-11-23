@@ -4,9 +4,14 @@ from flask_marshmallow import Marshmallow
 from marshmallow import fields
 import json
 import os
+from werkzeug.security import check_password_hash
+import jwt
+import datetime
+from functools import wraps
 
 # Init App
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'focus_secret'
 dirB = os.path.abspath(os.path.dirname(__file__))
 # Data Base
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(dirB, 'focus.sqlite')
@@ -20,10 +25,12 @@ ma = Marshmallow(app)
 # User Class/Model
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    public_id = db.Column(db.String(50), unique=True)
     name = db.Column(db.String(50))
     password = db.Column(db.String(20))
 
-    def __init__(self, name, password):
+    def __init__(self, public_id, name, password):
+        self.public_id = public_id
         self.name = name
         self.password = password
 
@@ -106,9 +113,45 @@ podcast_schema = PodcastSchema()
 podcasts_schema = PodcastSchema(many=True)
 
 
+# Token required
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+        if 'x-access-token' in request.headers:
+            token = request.headers['x-access-token']
+        if not token:
+            return jsonify({'message': 'Token is missing!'}), 401
+        try:
+            data = jwt.decode(token, app.config['SECRET_KEY'])
+            current_user = User.query.filter_by(public_id=data['public_id']).first()
+        except:
+            return jsonify({'message': 'Token is invalid!'}), 401
+        return f(current_user, *args, **kwargs)
+
+    return decorated
+
+
+@app.route('/login')
+def login():
+    auth = request.authorization
+    if not auth or not auth.username or not auth.password:
+        return make_response('Could not verify', 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})
+    user = User.query.filter_by(name=auth.username).first()
+    if not user:
+        return make_response('Could not verify', 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})
+    if check_password_hash(user.password, auth.password):
+        token = jwt.encode(
+            {'public_id' : user.public_id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)},
+            app.config['SECRET_KEY'])
+        return jsonify({'token': token.decode('UTF-8')})
+    return make_response('Could not verify', 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})
+
+
 # Podcasts search
 @app.route('/podcast/<value>', methods=['GET'])
-def get_podcast(value):
+@token_required
+def get_podcast(current_user, value):
     podcasts = Podcast.query.filter(Podcast.name.ilike("%" + value + "%")).all()
     result = podcasts_schema.dump(podcasts)
     return jsonify(result)
@@ -116,7 +159,8 @@ def get_podcast(value):
 
 # Save the top 20 podcasts
 @app.route('/podcast/top20', methods=['GET'])
-def get_top_podcast():
+@token_required
+def get_top_podcast(current_user):
     podcasts = Podcast.query.limit(20)
     result = podcasts_schema.dump(podcasts)
     with open(os.path.join(dirB, 'podcasts_separate_data.json'), 'w') as file:
@@ -126,7 +170,8 @@ def get_top_podcast():
 
 # Replace the top 20 podcasts for bottom 20
 @app.route('/podcast/bottom20', methods=['GET'])
-def get_bottom_podcast():
+@token_required
+def get_bottom_podcast(current_user):
     podcasts = Podcast.query.order_by(Podcast.id.desc()).limit(20)
     result = podcasts_schema.dump(podcasts)
     with open(os.path.join(dirB, 'podcasts_separate_data.json'), 'w') as file:
@@ -135,7 +180,8 @@ def get_bottom_podcast():
 
 
 @app.route('/podcast/<id>', methods=['DELETE'])
-def delete_podcast(id):
+@token_required
+def delete_podcast(current_user, id):
     podcast = Podcast.query.get(id)
     if podcast is None:
         return jsonify({'message': 'Podcast not found, could not be deleted'})
@@ -148,7 +194,8 @@ def delete_podcast(id):
 
 # Podcasts group_by_genre
 @app.route('/podcast/group_by_genre', methods=['GET'])
-def get_podcast_group_by_genre():
+@token_required
+def get_podcast_group_by_genre(current_user):
     slq_query = "SELECT p.name as 'name_p', p.artist_name, g.name as 'name_g', g.id" \
                 " FROM genre_podcasts as 'gp',podcast as 'p', genre as 'g' " \
                 "WHERE gp.genre_id = g.id AND gp.podcast_id = p.id " \
