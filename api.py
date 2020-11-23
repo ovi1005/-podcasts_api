@@ -106,7 +106,7 @@ podcast_schema = PodcastSchema()
 podcasts_schema = PodcastSchema(many=True)
 
 
-# Podcast search
+# Podcasts search
 @app.route('/podcast/<value>', methods=['GET'])
 def get_podcast(value):
     podcasts = Podcast.query.filter(Podcast.name.ilike("%" + value + "%")).all()
@@ -144,6 +144,31 @@ def delete_podcast(id):
         db.session.commit()
         return jsonify({'message': 'Successfully deleted from the podcast with id: ' +
                                    str(podcast.id) + ' and name: ' + podcast.name})
+
+
+# Podcasts group_by_genre
+@app.route('/podcast/group_by_genre', methods=['GET'])
+def get_podcast_group_by_genre():
+    slq_query = "SELECT p.name as 'name_p', p.artist_name, g.name as 'name_g', g.id" \
+                " FROM genre_podcasts as 'gp',podcast as 'p', genre as 'g' " \
+                "WHERE gp.genre_id = g.id AND gp.podcast_id = p.id " \
+                "ORDER BY gp.genre_id"
+    podcasts = db.engine.execute(slq_query)
+    out_podcast = []
+    out_genre = {}
+    flag = None
+    for podcast in podcasts:
+        podcast_data = {}
+        podcast_data['name_podcast'] = podcast.name_p
+        podcast_data['artist_name'] = podcast.artist_name
+        if flag is not None:
+            if flag != podcast.name_g:
+                out_genre.update({flag: out_podcast})
+                out_podcast = []
+        flag = podcast.name_g
+        out_podcast.append(podcast_data)
+    out_genre.update({flag: out_podcast})
+    return jsonify(out_genre)
 
 
 # Run Server
