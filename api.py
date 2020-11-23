@@ -93,7 +93,7 @@ genres_schema = GenreSchema(many=True)
 
 # Podcast Schema
 class PodcastSchema(ma.Schema):
-    genres = fields.Nested(GenreSchema,many=True)
+    genres = fields.Nested(GenreSchema, many=True)
 
     class Meta:
         fields = ('id', 'artist_name', 'release_date', 'name',
@@ -132,6 +132,19 @@ def get_bottom_podcast():
     with open(os.path.join(dirB, 'podcasts_separate_data.json'), 'w') as file:
         json.dump(result, file)
     return jsonify(result)
+
+
+@app.route('/podcast/<id>', methods=['DELETE'])
+def delete_podcast(id):
+    podcast = Podcast.query.get(id)
+    if podcast is None:
+        return jsonify({'message': 'Podcast not found, could not be deleted'})
+    else:
+        db.session.delete(podcast)
+        db.session.commit()
+        return jsonify({'message': 'Successfully deleted from the podcast with id: ' +
+                                   str(podcast.id) + ' and name: ' + podcast.name})
+
 
 # Run Server
 if __name__ == '__main__':
